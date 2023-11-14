@@ -1,0 +1,8 @@
+.successBtn {
+  background-color: green;
+  color: white;
+}
+
+.successBtn:hover {
+  background-color: rgb(91, 225, 91);
+}

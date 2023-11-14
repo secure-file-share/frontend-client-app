@@ -1,0 +1,33 @@
+.mainDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.loginHeading {
+  font-size: 40px;
+  letter-spacing: 5px;
+  margin-bottom: 20px;
+}
+
+.form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.password {
+  margin-top: 10px;
+}
+
+.loginBtnDiv {
+  margin-top: 20px;
+  /* width: 100%; */
+}
+
+.loginBtn {
+  min-width: 75%;
+}
