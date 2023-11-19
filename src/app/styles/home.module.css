@@ -1,0 +1,77 @@
+.mainDiv {
+  width: 100%;
+  height: 100vh;
+}
+
+.rowDiv {
+  /* width: 100%; */
+  height: 100%;
+}
+
+.sideBar {
+  background-color: #d9d9d9;
+  color: black;
+  padding: 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebarTitle {
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.homeDiv {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.homeDivTitle {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.dragger {
+  max-width: 70%;
+  margin-bottom: 1rem;
+}
+
+.bottomButtons {
+  position: fixed;
+  bottom: 0;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.receiveviacodeBtnDiv {
+  margin-bottom: 10px;
+}
+
+.tabDiv {
+  margin-top: 20px;
+}
+
+.uploadBtn {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.profileDiv {
+  position: fixed;
+  top: 0;
+  right: 0;
+}
+
+.user {
+  margin-top: 15px;
+  margin-right: 15px;
+}
+
+/* .receiveviacodeBtn {
+  background-color: rgb(212, 109, 212);
+  color: white;
+} */

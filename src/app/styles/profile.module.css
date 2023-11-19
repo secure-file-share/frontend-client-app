@@ -1,0 +1,42 @@
+.outerDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.mainDiv {
+  display: flex;
+  justify-content: center;
+  border-radius: 15px;
+  background-color: #d9d9d9;
+  padding: 1rem 1rem;
+  flex-direction: column;
+  width: 30%;
+}
+
+.userImage {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.labels {
+  margin-bottom: 5px;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.inputField {
+  width: 200px;
+}
+
+.buttonDiv {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
