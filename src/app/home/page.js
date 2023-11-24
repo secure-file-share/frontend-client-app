@@ -1,5 +1,6 @@
 "use client";
 import styles from "../styles/home.module.css";
+import { useState } from "react";
 import { InboxOutlined } from "@ant-design/icons";
 import { Col, Row, message, Upload, Button, Tabs } from "antd";
 import SuccessBtn from "../components/successBtn";
@@ -8,9 +9,19 @@ import userSolid from "../../../public/user-solid.svg";
 import Image from "next/image";
 import Link from "next/link";
 
+import { setAuth, setRefreshTimer } from "../../../authentication";
+import { loadFromLocalStorage } from "../../../localStorage";
+
 const { Dragger } = Upload;
 
 const MainPage = () => {
+  function logout() {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("auth");
+      window.location.href = "/login";
+    }
+  }
+
   const props = {
     name: "file",
     multiple: true,
@@ -30,6 +41,20 @@ const MainPage = () => {
       console.log("Dropped files", e.dataTransfer.files);
     },
   };
+
+  // const [user, setUser] = useState("Who am I?");
+
+  let auth = loadFromLocalStorage("auth");
+  let user = "Who am I?";
+
+  if (auth) {
+    setAuth(auth);
+    setRefreshTimer(auth.refresh);
+    // setUser(auth.user.username);
+    user = auth.user.username;
+  } else {
+    logout();
+  }
 
   return (
     <div className={styles.mainDiv}>
@@ -73,15 +98,27 @@ const MainPage = () => {
         </Col>
         <Col className={styles.homeDiv} span={18}>
           <div className={styles.profileDiv}>
-            <Link href="/profile">
-              <Image
-                src={userSolid}
-                className={styles.user}
-                alt="User"
-                height={25}
-                width={25}
-              />
-            </Link>
+            <SuccessBtn onClick={logout}>Log Out</SuccessBtn>
+            <div style={{ marginLeft: "1rem" }}>
+              <Link
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "black",
+                }}
+                href="/profile"
+              >
+                <Image
+                  src={userSolid}
+                  className={styles.user}
+                  alt="User"
+                  height={20}
+                  width={20}
+                />
+                {user}
+              </Link>
+            </div>
           </div>
           <div className={styles.homeDivTitle}>SECURE FILE SHARE</div>
           <div className={styles.dragger}>

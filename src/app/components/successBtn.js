@@ -7,6 +7,7 @@ export default function SuccessBtn(props) {
       type="success"
       className={styles.successBtn}
       style={props.style || null}
+      {...props}
     >
       {props.children}
     </Button>

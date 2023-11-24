@@ -29,5 +29,11 @@
 }
 
 .loginBtn {
-  min-width: 75%;
+  min-width: 100%;
+  background-color: green;
+  color: white;
+}
+
+.loginBtn:hover {
+  background-color: rgb(91, 225, 91);
 }
