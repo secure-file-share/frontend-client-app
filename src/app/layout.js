@@ -5,7 +5,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "SecureFileShare",
-  description: "SecureFileShare client app",
+  description: "Share files securely with team members",
 };
 
 export default function RootLayout({ children }) {
