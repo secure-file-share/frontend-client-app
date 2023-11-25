@@ -99,44 +99,16 @@ const MainPage = () => {
   }
 
   function fetchFiles() {
-    $.ajax({
-      url: "https://securefileshare.pythonanywhere.com/api/fileshare/fileshare/",
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${auth.access}`,
-      },
-      success: (resp) => {
-        if (resp.status) {
-          setFiles(resp.results);
-        } else {
-          console.log(resp);
-        }
-      },
-      error: (err) => {
-        console.log(err);
-        messageApi.open({
-          type: "error",
-          content: "Unable to fetch files",
-        });
-      },
-    });
-  }
-
-  function deleteFile(id) {
-    if (window.confirm("Are you sure you want to delete this file?"))
+    if (typeof window !== "undefined") {
       $.ajax({
-        url: `https://securefileshare.pythonanywhere.com/api/fileshare/fileshare/${id}/`,
-        method: "DELETE",
+        url: "https://securefileshare.pythonanywhere.com/api/fileshare/fileshare/",
+        method: "GET",
         headers: {
           Authorization: `Bearer ${auth.access}`,
         },
         success: (resp) => {
           if (resp.status) {
-            fetchFiles();
-            messageApi.open({
-              type: "success",
-              content: "File deleted",
-            });
+            setFiles(resp.results);
           } else {
             console.log(resp);
           }
@@ -149,6 +121,38 @@ const MainPage = () => {
           });
         },
       });
+    }
+  }
+
+  function deleteFile(id) {
+    if (typeof window !== "undefined") {
+      if (window.confirm("Are you sure you want to delete this file?"))
+        $.ajax({
+          url: `https://securefileshare.pythonanywhere.com/api/fileshare/fileshare/${id}/`,
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${auth.access}`,
+          },
+          success: (resp) => {
+            if (resp.status) {
+              fetchFiles();
+              messageApi.open({
+                type: "success",
+                content: "File deleted",
+              });
+            } else {
+              console.log(resp);
+            }
+          },
+          error: (err) => {
+            console.log(err);
+            messageApi.open({
+              type: "error",
+              content: "Unable to fetch files",
+            });
+          },
+        });
+    }
   }
 
   fetchFiles();
