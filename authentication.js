@@ -28,7 +28,7 @@ export function setRefreshTimer(refresh) {
         },
       });
     },
-    3 * 60 * 1000 // minutes, seconds, milliseconds
+    1 * 60 * 1000 // minutes, seconds, milliseconds
   );
 }
 
