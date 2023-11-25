@@ -22,6 +22,7 @@ import Link from "next/link";
 
 import { setAuth, setRefreshTimer } from "../../../authentication";
 import { loadFromLocalStorage } from "../../../localStorage";
+import { API_ROOT } from "../../../authentication";
 
 import $ from "jquery";
 
@@ -34,26 +35,6 @@ const MainPage = () => {
       window.location.href = "/login";
     }
   }
-
-  const props = {
-    name: "file",
-    multiple: true,
-    action: "https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188",
-    onChange(info) {
-      const { status } = info.file;
-      if (status !== "uploading") {
-        console.log(info.file, info.fileList);
-      }
-      if (status === "done") {
-        message.success(`${info.file.name} file uploaded successfully.`);
-      } else if (status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
-      }
-    },
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
-    },
-  };
 
   let auth = loadFromLocalStorage("auth");
   let user = "Who am I?";
@@ -75,6 +56,7 @@ const MainPage = () => {
   const [filterUser, setFilterUser] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [file, setFile] = useState(null);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -87,14 +69,11 @@ const MainPage = () => {
   };
 
   function downloadFile(filename, ext, code) {
-    fetch(
-      `https://securefileshare.pythonanywhere.com/api/fileshare/fileshare/${code}/`,
-      {
-        headers: {
-          Authorization: `Bearer ${auth.access}`,
-        },
-      }
-    )
+    fetch(`${API_ROOT}/api/fileshare/fileshare/${code}/`, {
+      headers: {
+        Authorization: `Bearer ${auth.access}`,
+      },
+    })
       .then((resp) => resp.blob())
       .then((blob) => {
         if (typeof window !== "undefined") {
@@ -121,7 +100,7 @@ const MainPage = () => {
   function fetchUsers() {
     if (typeof window !== "undefined") {
       $.ajax({
-        url: "https://securefileshare.pythonanywhere.com/api/client/search/",
+        url: `${API_ROOT}/api/client/search/`,
         method: "GET",
         headers: {
           Authorization: `Bearer ${auth.access}`,
@@ -157,7 +136,7 @@ const MainPage = () => {
   function fetchFiles() {
     if (typeof window !== "undefined") {
       $.ajax({
-        url: "https://securefileshare.pythonanywhere.com/api/fileshare/fileshare/",
+        url: `${API_ROOT}/api/fileshare/fileshare/`,
         method: "GET",
         headers: {
           Authorization: `Bearer ${auth.access}`,
@@ -184,7 +163,7 @@ const MainPage = () => {
     if (typeof window !== "undefined") {
       if (window.confirm("Are you sure you want to delete this file?"))
         $.ajax({
-          url: `https://securefileshare.pythonanywhere.com/api/fileshare/fileshare/${id}/`,
+          url: `${API_ROOT}/api/fileshare/fileshare/${id}/`,
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${auth.access}`,
@@ -210,6 +189,59 @@ const MainPage = () => {
         });
     }
   }
+
+  function uploadFile(username) {
+    if (typeof window !== "undefined") {
+      let formData = new FormData();
+
+      formData.append("shared_to", username);
+      formData.append("file", file.originFileObj);
+
+      $.ajax({
+        url: `${API_ROOT}/api/fileshare/fileshare/`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${auth.access}`,
+        },
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: (resp) => {
+          if (resp.status) {
+            messageApi.open({
+              type: "success",
+              content: "File shared",
+            });
+            setIsModalOpen(false);
+          } else {
+            console.log(resp);
+            messageApi.open({
+              type: "warning",
+              content: "Unable to share",
+            });
+          }
+          fetchFiles();
+        },
+        error: (err) => {
+          console.log(err);
+          messageApi.open({
+            type: "error",
+            content: "Unable to share",
+          });
+        },
+      });
+    }
+  }
+
+  const props = {
+    name: "file",
+    showUploadList: false,
+    customRequest: () => {},
+    onChange(info) {
+      setFile(info.file);
+      showModal(true);
+    },
+  };
 
   useEffect(() => {
     fetchFiles();
@@ -415,14 +447,21 @@ const MainPage = () => {
                 uploading company data or other banned files.
               </p>
             </Dragger>
-            <div className={styles.uploadBtn}>
+            {/* <div className={styles.uploadBtn}>
               <SuccessBtn onClick={showModal}>Upload</SuccessBtn>
-            </div>
+            </div> */}
           </div>
         </Col>
       </Row>
       <Modal
-        title="Share with..."
+        title={`Share ${
+          file
+            ? file.name.length > 20
+              ? `${file.name.substring(0, 20)}...`
+              : file.name
+            : null
+        } with...`}
+        footer={null}
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -462,7 +501,15 @@ const MainPage = () => {
                   <small>{user.email}</small>
                 </div>
                 <div>
-                  <Button size="sm">Share</Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      showModal(false);
+                      uploadFile(user.username);
+                    }}
+                  >
+                    Share
+                  </Button>
                 </div>
               </div>
             </List.Item>
