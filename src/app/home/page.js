@@ -1,10 +1,21 @@
 "use client";
 import styles from "../styles/home.module.css";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InboxOutlined } from "@ant-design/icons";
-import { Col, Row, message, Upload, Button, Tabs } from "antd";
+import {
+  Col,
+  Row,
+  message,
+  Upload,
+  Button,
+  Tabs,
+  Modal,
+  Input,
+  List,
+  Divider,
+  Popover,
+} from "antd";
 import SuccessBtn from "../components/successBtn";
-import React from "react";
 import userSolid from "../../../public/user-solid.svg";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,7 +24,6 @@ import { setAuth, setRefreshTimer } from "../../../authentication";
 import { loadFromLocalStorage } from "../../../localStorage";
 
 import $ from "jquery";
-import { headers } from "../../../next.config";
 
 const { Dragger } = Upload;
 
@@ -45,8 +55,6 @@ const MainPage = () => {
     },
   };
 
-  // const [user, setUser] = useState("Who am I?");
-
   let auth = loadFromLocalStorage("auth");
   let user = "Who am I?";
 
@@ -63,8 +71,20 @@ const MainPage = () => {
     shared_with_you: [],
     shared_by_you: [],
   });
-
+  const [users, setUsers] = useState([]);
+  const [filterUser, setFilterUser] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   function downloadFile(filename, ext, code) {
     fetch(
@@ -96,6 +116,42 @@ const MainPage = () => {
           content: "Unable to download",
         });
       });
+  }
+
+  function fetchUsers() {
+    if (typeof window !== "undefined") {
+      $.ajax({
+        url: "https://securefileshare.pythonanywhere.com/api/client/search/",
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${auth.access}`,
+        },
+        data: {
+          q: "",
+        },
+        success: (resp) => {
+          if (resp.status) {
+            let results = resp.results;
+            for (let u of results) {
+              if (u.username === user) {
+                results.splice(results.indexOf(u), 1);
+                break;
+              }
+            }
+            setUsers(results);
+          } else {
+            console.log(resp);
+          }
+        },
+        error: (err) => {
+          console.log(err);
+          messageApi.open({
+            type: "error",
+            content: "Unable to fetch users",
+          });
+        },
+      });
+    }
   }
 
   function fetchFiles() {
@@ -155,7 +211,10 @@ const MainPage = () => {
     }
   }
 
-  fetchFiles();
+  useEffect(() => {
+    fetchFiles();
+    fetchUsers();
+  }, []);
 
   return (
     <div className={styles.mainDiv}>
@@ -184,16 +243,29 @@ const MainPage = () => {
                                   ? `${f.file.name.substring(0, 10)}...`
                                   : f.file.name}
                                 <br />
-                                <small>
-                                  {f.file.size.megabytes} MB, {f.file.ext}
-                                  <br />
-                                  <small>
-                                    <i>
-                                      Shared to {f.shared_to.username} on{" "}
-                                      {f.created_at.datetime}
-                                    </i>
+                                <Popover
+                                  placement="right"
+                                  content={
+                                    <>
+                                      <small>
+                                        {f.file.size.megabytes} MB
+                                        <br />
+                                        {f.file.ext} file
+                                        <br />
+                                        Shared to {f.shared_to.username} on{" "}
+                                        {f.created_at.datetime}
+                                        <br />
+                                        Expires on {f.file.expiration.datetime}
+                                      </small>
+                                    </>
+                                  }
+                                  title="More info"
+                                  trigger="click"
+                                >
+                                  <small className={styles.downloadBtn}>
+                                    More info
                                   </small>
-                                </small>
+                                </Popover>
                               </div>
                               <div>
                                 <small
@@ -344,11 +416,59 @@ const MainPage = () => {
               </p>
             </Dragger>
             <div className={styles.uploadBtn}>
-              <SuccessBtn>Upload</SuccessBtn>
+              <SuccessBtn onClick={showModal}>Upload</SuccessBtn>
             </div>
           </div>
         </Col>
       </Row>
+      <Modal
+        title="Share with..."
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <Input
+          placeholder="Filter user by username..."
+          onChange={(e) => setFilterUser(e.target.value)}
+          value={filterUser}
+        />
+        <Divider />
+        <List
+          size="large"
+          bordered
+          dataSource={
+            filterUser
+              ? users.filter(
+                  (user) =>
+                    user.username
+                      .toLowerCase()
+                      .indexOf(filterUser.toLowerCase()) !== -1
+                )
+              : users
+          }
+          renderItem={(user) => (
+            <List.Item>
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  {user.username}
+                  <br />
+                  <small>{user.email}</small>
+                </div>
+                <div>
+                  <Button size="sm">Share</Button>
+                </div>
+              </div>
+            </List.Item>
+          )}
+        />
+      </Modal>
     </div>
   );
 };
