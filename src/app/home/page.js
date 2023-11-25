@@ -345,16 +345,29 @@ const MainPage = () => {
                                   ? `${f.file.name.substring(0, 10)}...`
                                   : f.file.name}
                                 <br />
-                                <small>
-                                  {f.file.size.megabytes} MB, {f.file.ext}
-                                  <br />
-                                  <small>
-                                    <i>
-                                      Shared by {f.shared_by.username} on{" "}
-                                      {f.created_at.datetime}
-                                    </i>
+                                <Popover
+                                  placement="right"
+                                  content={
+                                    <>
+                                      <small>
+                                        {f.file.size.megabytes} MB
+                                        <br />
+                                        {f.file.ext} file
+                                        <br />
+                                        Shared by {f.shared_by.username} on{" "}
+                                        {f.created_at.datetime}
+                                        <br />
+                                        Expires on {f.file.expiration.datetime}
+                                      </small>
+                                    </>
+                                  }
+                                  title="More info"
+                                  trigger="click"
+                                >
+                                  <small className={styles.downloadBtn}>
+                                    More info
                                   </small>
-                                </small>
+                                </Popover>
                               </div>
                               <div>
                                 <small
