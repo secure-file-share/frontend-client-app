@@ -3,6 +3,8 @@
 import $ from "jquery";
 import { saveToLocalStorage, loadFromLocalStorage } from "./localStorage";
 
+export const API_ROOT = "https://securefileshare.pythonanywhere.com";
+
 export function setAuth(auth) {
   saveToLocalStorage("auth", auth);
 }
@@ -11,9 +13,7 @@ export function setRefreshTimer(refresh) {
   setInterval(
     () => {
       $.ajax({
-        url:
-          `https://securefileshare.pythonanywhere.com` +
-          `/api/auth/token/refresh/`,
+        url: API_ROOT + `/api/auth/token/refresh/`,
         method: "POST",
         data: {
           refresh,
@@ -39,8 +39,7 @@ export function logInAction(
   errorCallback
 ) {
   $.ajax({
-    url:
-      `https://securefileshare.pythonanywhere.com` + `/api/auth/token/login/`,
+    url: API_ROOT + `/api/auth/token/login/`,
     method: "POST",
     data: {
       username,
