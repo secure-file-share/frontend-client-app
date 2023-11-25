@@ -35,8 +35,9 @@
 }
 
 .dragger {
-  max-width: 70%;
-  margin-bottom: 1rem;
+  /* max-width: 70%; */
+  /* margin-bottom: 1rem; */
+  padding: 3rem !important;
 }
 
 .bottomButtons {
