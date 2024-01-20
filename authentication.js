@@ -3,7 +3,7 @@
 import $ from "jquery";
 import { saveToLocalStorage, loadFromLocalStorage } from "./localStorage";
 
-export const API_ROOT = "https://securefileshare.pythonanywhere.com";
+export const API_ROOT = "https://securefileshare.vercel.app";
 
 export function setAuth(auth) {
   saveToLocalStorage("auth", auth);
